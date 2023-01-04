@@ -1138,11 +1138,11 @@ public:
 
       struct dirent *d = ::readdir(_dirp);
       unset(DID_STAT); // instead of updating _item->st, just mark it out-of-date
-      if (d > 0)
+      if (d != NULL)
       {
          strncpy(path, d->d_name, size);
       }
-      else if (d < 0)
+      else if (errno != 0)
       {
          _errno = errno;
          return bool(_errno == 0);
@@ -2402,17 +2402,18 @@ public:
    // TBD: See opendir()
    virtual bool readdir(char *path, size_t size)
    {
+      errno = 0;
       if (size)
       {
          path[0] = 0;
       }
       struct dirent *d = marfs_readdir(dh);
       unset(DID_STAT);
-      if (d > 0)
+      if (d != NULL)
       {
          strncpy(path, d->d_name, size);
       }
-      else if (d < 0)
+      else if (errno != 0)
       {
          _errno = errno;
          return false;
